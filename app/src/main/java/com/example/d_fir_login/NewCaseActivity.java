@@ -43,11 +43,11 @@ public class NewCaseActivity extends AppCompatActivity {
                 Calendar calendar = Calendar.getInstance();
                 SimpleDateFormat dateFormat = new SimpleDateFormat("MM-dd-yyyy HH:mm:ss");
                 String Date = dateFormat.format(calendar.getTime());
-                final Case cases = new Case(txtCaseId.getText().toString(), txtCaseCategory.getText().toString(), txtOfficerName.getText().toString(), txtage.getText().toString(), Date);
+                final Case cases = new Case(txtCaseId.getText().toString(), txtCaseCategory.getText().toString(), txtOfficerName.getText().toString(), Date, txtage.getText().toString());
 
-               reference.child(cases.getCaseId()).setValue(cases);
+                reference.child(cases.getCaseId()).setValue(cases);
 
-                Intent intent = new Intent(NewCaseActivity.this, DashboardActivity.class);
+                Intent intent = new Intent(NewCaseActivity.this, SearchActivity.class);
                 startActivity(intent);
 
             }

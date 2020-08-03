@@ -11,7 +11,6 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
-import android.icu.text.SimpleDateFormat;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -37,12 +36,18 @@ import androidx.core.content.ContextCompat;
 import com.google.android.gms.vision.Frame;
 import com.google.android.gms.vision.text.TextBlock;
 import com.google.android.gms.vision.text.TextRecognizer;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 import com.theartofdev.edmodo.cropper.CropImage;
 import com.theartofdev.edmodo.cropper.CropImageView;
 
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Locale;
 public class ScanActivity extends AppCompatActivity {
 
@@ -51,21 +56,35 @@ public class ScanActivity extends AppCompatActivity {
     private  static final int STORAGE_REQUEST_CODE = 400;
     private  static final int IMAGE_PICK_GALLERY_CODE = 1000;
     private  static final int IMAGE_PICK_CAMERA_CODE = 1001;
+    private Calendar calendar;
     Button save;
     String cameraPermission[];
     String storagePermission[];
     EditText mResultEt;
     ImageView mPreviewIv;
     Uri image_uri;
-    String mText;
+    String mText, officerName, officerId, caseId;
+
+    private StorageReference storageReference;
+    private DatabaseReference databaseReference;
+
+    private FirebaseStorage firebaseStorage;
+    private FirebaseDatabase firebaseDatabase;
+
+    private Uri input_uri;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_scan);
 
+        firebaseStorage = FirebaseStorage.getInstance();
+        firebaseDatabase = FirebaseDatabase.getInstance();
+
         mResultEt = findViewById(R.id.resultEt);
         mPreviewIv = findViewById(R.id.imageIv);
+
+        calendar =  Calendar.getInstance();
 
         save = findViewById(R.id.msave);
         mResultEt = findViewById(R.id.resultEt);
@@ -75,6 +94,14 @@ public class ScanActivity extends AppCompatActivity {
         storagePermission = new String[]{
                 Manifest.permission.WRITE_EXTERNAL_STORAGE
         };
+
+        /*Intent intent = getIntent();
+        str3 = intent.getStringExtra("caseid1");*/
+        Intent intent = getIntent();
+        Bundle extras3 = intent.getExtras();
+        officerName = extras3.getString("officerName");
+        officerId = extras3.getString("officerId");
+        caseId = extras3.getString("caseId");
 
         save.setOnClickListener(new View.OnClickListener() {
             @RequiresApi(api = Build.VERSION_CODES.N)
@@ -106,17 +133,19 @@ public class ScanActivity extends AppCompatActivity {
 
     @RequiresApi(api = Build.VERSION_CODES.N)
     private void saveToTxtFile(String mText) {
-        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss",
-                Locale.getDefault()).format(System.currentTimeMillis());
+        SimpleDateFormat dateFormat;
+
+        dateFormat = new SimpleDateFormat("MM-dd-yyyy HH:mm:ss");
+        String date = dateFormat.format(calendar.getTime());
         try {
-            String fileName = "MyFile_" + timeStamp + ".txt";
-            //String path = Environment.getExternalStorageDirectory()+ "/" + fileName;
-           // File dir = new File(path +"/My_Files/")
+          //  String fileName = "MyFile_" + timeStamp + ".txt";
+            String caseFilename1 = caseId + "_(" + officerName + " - " + officerId + ")" + "_(" + date + ").txt";
+            //String caseFileName = caseId + "_(" + officerName + " - " + officerId + ")" + "_(" + date + ")";
             File dir = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/My_Files/");
             if(!dir.exists()){
                 dir.mkdir();
             }
-            File file = new File(dir, fileName);
+            File file = new File(dir, caseFilename1);
 
             FileWriter fw = new FileWriter(file.getAbsoluteFile());
 
@@ -124,7 +153,9 @@ public class ScanActivity extends AppCompatActivity {
             bw.write(mText);
             bw.close();
 
-            Toast.makeText(this,fileName+ "is saved to\n" + dir, Toast.LENGTH_SHORT).show();
+            input_uri = Uri.fromFile(file);
+
+            Toast.makeText(this,caseFilename1+ "is saved to\n" + dir, Toast.LENGTH_SHORT).show();
         }
         catch (Exception e){
             Toast.makeText(this,e.getMessage(), Toast.LENGTH_SHORT).show();

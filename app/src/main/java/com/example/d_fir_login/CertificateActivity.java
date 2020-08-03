@@ -22,6 +22,7 @@ import com.itextpdf.text.Font;
 import com.itextpdf.text.Paragraph;
 import com.itextpdf.text.pdf.PdfWriter;
 
+import java.io.File;
 import java.io.FileOutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -71,8 +72,11 @@ public class CertificateActivity extends AppCompatActivity {
 
         String mFileName = str3;
 
-        String mFilePath = Environment.getExternalStorageDirectory() + "/" + mFileName + ".pdf";
-
+        String mFilePath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/65B_Certificates/" + mFileName + ".pdf";
+        File dir = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/65B_Certificates/");
+        if(!dir.exists()){
+            dir.mkdir();
+        }
         try {
 
             PdfWriter.getInstance(mDoc, new FileOutputStream(mFilePath));
@@ -121,7 +125,7 @@ public class CertificateActivity extends AppCompatActivity {
 
             Chunk c10 = new Chunk(" Dated " + date + ".", font5);
 
-            Chunk c11 = new Chunk(" (Signature) Full Name of maker", font5);
+            Chunk c11 = new Chunk(" (Signature) " + str2, font5);
 
 
             Paragraph ph = new Paragraph(c1);
@@ -197,8 +201,7 @@ public class CertificateActivity extends AppCompatActivity {
 
             Toast.makeText(this, mFileName + ".pdf is saved to\n" + mFilePath, Toast.LENGTH_LONG).show();
         } catch (Exception e) {
-            //Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
-            Toast.makeText(this, str +"+" +str2 +"+"+str3, Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -208,8 +211,7 @@ public class CertificateActivity extends AppCompatActivity {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 savePdf();
             } else {
-                //Toast.makeText(this, "Permission denied...!", Toast.LENGTH_SHORT).show();
-                Toast.makeText(this, str +"+" +str2 +"+"+str3, Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Permission denied...!", Toast.LENGTH_SHORT).show();
             }
         }
     }

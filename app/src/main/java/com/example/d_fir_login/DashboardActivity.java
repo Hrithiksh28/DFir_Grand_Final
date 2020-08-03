@@ -89,7 +89,12 @@ public class DashboardActivity extends AppCompatActivity {
         scan.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(DashboardActivity.this, ScanActivity.class);
+                Intent intent = new Intent(DashboardActivity.this, SearchScanActivity.class);
+
+                Bundle extras2 = new Bundle();
+                extras2.putString("EmployeeId", id);
+                intent.putExtras(extras2);
+
                 startActivity(intent);
             }
         });

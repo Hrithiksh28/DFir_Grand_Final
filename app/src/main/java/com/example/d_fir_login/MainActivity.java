@@ -67,7 +67,7 @@ public class MainActivity extends AppCompatActivity {
                         Intent intent = new Intent(MainActivity.this, DashboardActivity.class);
 
                         Bundle extras = new Bundle();
-                        extras.putString("EmployeeId", EmployeeId);
+                        extras.putString("EmployeeId", login.getEmployeeId());
                         extras.putString("OfficerName", officerName);
                         intent.putExtras(extras);
 
